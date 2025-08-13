@@ -12,9 +12,6 @@ n-grid.bg4(cols="24" item-responsive responsive="screen")
                     n-input(placeholder="请输入账号" v-model:value="state.login.name")
                 n-form-item
                     n-input(placeholder="请输入密码" type="password" v-model:value="state.login.password" show-password-on="mousedown")
-                n-form-item
-                    n-input(placeholder="验证码" style="width: 70%" v-model:value="state.chaptcha")
-                    img(:src="state.bs64" alt="点击此处刷新验证码" style="width:30%;border-bottom-right-radius: 3px;border-top-right-radius: 3px;" height="40" @click="getCaptcha")
         n-flex(justify="center" style="padding-bottom: 40px;")
             n-button(type="primary" size="large" style="padding:0 40px;box-shadow:none" @click="login") 登录
     n-gi(span="0 s:2 m:3 l:5 xl:6 2xl:6")
@@ -29,26 +26,12 @@ div
 <script setup>
 const router = useRouter() // 用于跳转
 const state = reactive({
-    uuid: "",
-    bs64: null,
-    chaptcha: "",
     login: { name: "admin", password: "123456" }, // 默认admin 123456
 })
-
-const getCaptcha = async () => {
-    const { data } = await useFetch('/api/captcha').json() // 不同于nuxt3,此处需要手动指定json()或bolb()，默认为text()
-    if (data.value?.status == 200) {
-        state.uuid = data.value.uuid
-        state.bs64 = data.value.data
-    } else {
-        toast("获取验证码失败")
-    }
-}
 
 const login = async () => {
     if (!state.login.name) { toast("请输入账号"); return; }
     if (!state.login.password) { toast("请输入密码"); return; }
-    if (!state.chaptcha) { toast("请输入验证码"); return; }
     const { data } = await useFetch('/api/login', {
         method: 'POST',
         headers: {
@@ -56,9 +39,7 @@ const login = async () => {
         },
         body: JSON.stringify({
             name: state.login.name,
-            password: state.login.password,
-            uuid: state.uuid,
-            captcha: Number(state.chaptcha)
+            password: state.login.password
         })
     }
     ).json()
@@ -68,15 +49,8 @@ const login = async () => {
         toast("Boss,欢迎回来")
     } else {
         toast(data.value.msg) // 登录失败
-        if (data.value.status == 300) {
-            getCaptcha() // 重新获取验证码
-        }
     }
 }
-
-onMounted(() => {
-    getCaptcha()
-})
 </script>
 
 

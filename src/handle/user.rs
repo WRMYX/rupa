@@ -20,12 +20,6 @@ use serde_default::serde_default;
 use serde_json::json;
 use std::sync::Arc;
 
-// 获取验证码
-pub async fn make_chaptcha() -> impl IntoResponse {
-	let res = config::make_chaptcha();
-	Json(json!({"status":200,"uuid":res.0,"data":res.1,}))
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
 	pub exp: usize, // 必须，
@@ -35,17 +29,12 @@ pub struct Claims {
 #[derive(Debug, Deserialize)]
 pub struct LoginInput {
 	name: String,     // 登录账号
-	password: String, // 登录账号
-	captcha: u32,     // 验证码
-	uuid: String,     // 验证码标识
+	password: String, // 登录密码
 }
 // 登录
 pub async fn login(Json(input): Json<LoginInput>) -> impl IntoResponse {
 	if input.name.is_empty() || input.password.is_empty() {
 		return Json(json!({"status":400,"msg":"参数错误",}));
-	}
-	if !config::check_chaptcha(input.uuid.as_str(), input.captcha) {
-		return Json(json!({"status":300,"msg":"验证码错误",}));
 	}
 	// 查询用户
 	let db = config::get_db().await;
