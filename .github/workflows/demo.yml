@@ -30,7 +30,7 @@ jobs:
           nohup ./target/release/rupa &       
           sleep 1
           # 使用curl检查web服务
-          if curl -s "http://127.0.0.1:3399/api/captcha" | grep 200 > /dev/null
+          if curl -s "http://127.0.0.1:3399/api/login" | grep -q "参数错误"
           then
             echo "Web服务器运行正常"
           else

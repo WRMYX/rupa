@@ -46,7 +46,6 @@ pub fn init() -> Router {
 		.route("/", get(handle::vue::index)) // 前端静态资源
 		.route("/favicon.ico", get(handle::vue::favicon)) // 图标
 		.route("/assets/:path", get(handle::vue::assets)) // 前端静态资源
-		.route("/api/captcha", get(handle::user::make_chaptcha)) // 验证码
 		.route("/api/login", post(handle::user::login)) // 登录
 		// 管理入口
 		// .nest("/api/v2", admin())
